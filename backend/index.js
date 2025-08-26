@@ -6,11 +6,17 @@ const User = require('./models/User');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+// Configure CORS to allow the deployed frontend
+const allowedOrigin = process.env.FRONTEND_URL;
+app.use(cors({
+  origin: allowedOrigin,
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB connection with better error handling
-mongoose.connect('mongodb://localhost:27017/grievance-system')
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB successfully');
   })
@@ -114,5 +120,5 @@ app.get('/api/test', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Test the API at: http://localhost:${PORT}/api/test`);
+  // console.log(`Test the API at: http://localhost:${PORT}/api/test`);
 });
