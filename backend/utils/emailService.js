@@ -43,16 +43,23 @@ const createRealTransporter = () => {
 
 // Create a test transporter for development (Ethereal)
 const createTestAccount = async () => {
-  const testAccount = await nodemailer.createTestAccount();
-  return nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
-    },
-  });
+  try {
+    const testAccount = await nodemailer.createTestAccount();
+    return nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: testAccount.user,
+        pass: testAccount.pass,
+      },
+    });
+  } catch (e) {
+    // In offline/dev environments without network, fall back to a no-op transporter
+    return {
+      sendMail: async () => ({ messageId: 'noop', previewUrl: null })
+    };
+  }
 };
 
 // Get transporter: prefer real SMTP via env, else Ethereal

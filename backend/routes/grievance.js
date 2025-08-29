@@ -127,10 +127,6 @@ router.get('/', auth, async (req, res) => {
       // Dean can see all grievances
       console.log('Dean role detected - showing all grievances');
       filter = {};
-    } else if (role === 'admin') {
-      // Admin can see staff, network, and security grievances
-      console.log('Admin role detected - filtering by categories');
-      filter.category = { $in: ['staff', 'network', 'security'] };
     } else if (role === 'hod') {
       // HOD can see student and faculty grievances
       console.log('HOD role detected - filtering by categories');
@@ -194,8 +190,6 @@ router.get('/attachments/:grievanceId/:filename', auth, async (req, res) => {
 
     if (role === 'dean') {
       hasAccess = true;
-    } else if (role === 'admin' && ['staff', 'network', 'security'].includes(grievance.category)) {
-      hasAccess = true;
     } else if (role === 'hod' && ['student', 'faculty'].includes(grievance.category)) {
       hasAccess = true;
     } else if (grievance.submittedBy.toString() === req.user.id) {
@@ -230,8 +224,8 @@ router.put('/:id/status', auth, async (req, res) => {
     const { role } = req.user;
     const { status, comments } = req.body;
 
-    // Only admin, dean, and hod can update status
-    if (!['admin', 'dean', 'hod'].includes(role)) {
+    // Only dean and hod can update status
+    if (!['dean', 'hod'].includes(role)) {
       return res.status(403).json({ message: 'You do not have permission to update grievance status' });
     }
 
@@ -278,8 +272,6 @@ router.get('/stats', auth, async (req, res) => {
     // Apply role-based filtering for statistics
     if (role === 'dean') {
       filter = {};
-    } else if (role === 'admin') {
-      filter.category = { $in: ['staff', 'network', 'security'] };
     } else if (role === 'hod') {
       filter.category = { $in: ['student', 'faculty'] };
     } else {
