@@ -24,13 +24,16 @@
 
 // export default App;
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Login from './components/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import SubmitGrievance from './pages/SubmitGrievance';
+import AboutUs from './pages/AboutUs';
+import ForgotPassword from './components/ForgotPassword';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // ProtectedRoute component with proper authentication checks
@@ -74,10 +77,23 @@ function Home() {
 function AppRoutes() {
   return (
     <Router>
+      <AppContent />
+    </Router>
+  );
+}
+
+function AppContent() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  
+  return (
+    <>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         
         {/* Dashboard: all authenticated users */}
         <Route 
@@ -104,7 +120,8 @@ function AppRoutes() {
         {/* Catch all route - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+      {isHomePage && <Footer />}
+    </>
   );
 }
 

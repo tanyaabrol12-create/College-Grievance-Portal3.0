@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 function GrievanceCard({ grievance, onStatusUpdate }) {
   const [status, setStatus] = useState(grievance.status || 'Pending');
+  const [comments, setComments] = useState(grievance.comments || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -19,7 +20,10 @@ function GrievanceCard({ grievance, onStatusUpdate }) {
     setSuccess('');
     
     try {
-      await API.put(`/grievances/${grievance._id}/status`, { status: newStatus });
+      await API.put(`/grievances/${grievance._id}/status`, { 
+        status: newStatus,
+        comments: comments 
+      });
       setStatus(newStatus);
       setSuccess('Status updated successfully!');
       if (onStatusUpdate) {
@@ -197,6 +201,34 @@ function GrievanceCard({ grievance, onStatusUpdate }) {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Comments Section */}
+        {canUpdateStatus && (
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <h4 className="text-lg font-bold text-gray-800 mb-3">
+              💬 Admin Comments
+            </h4>
+            <textarea
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="Add comments for the user..."
+              className="form-textarea w-full"
+              rows="3"
+            />
+          </div>
+        )}
+
+        {/* Show existing comments */}
+        {grievance.comments && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <h4 className="text-sm font-bold text-gray-700 mb-2">
+              💬 Admin Comments:
+            </h4>
+            <p className="text-gray-600 text-sm italic">
+              "{grievance.comments}"
+            </p>
           </div>
         )}
 

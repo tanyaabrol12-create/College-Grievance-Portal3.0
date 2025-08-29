@@ -38,20 +38,46 @@ const Login = () => {
     setLoading(true);
     setError('');
     
+    console.log('Login attempt:', { email: formData.email, loginType });
+    
     try {
+      console.log('Sending login request...');
       const res = await API.post('/auth/login', formData);
+      console.log('Login response:', res.data);
+      
       // Prevent users from logging in via admin portal
       if (loginType === 'admin' && !['admin', 'dean', 'hod'].includes(res.data.user.role)) {
+        console.warn('Non-admin attempted to login through admin portal');
         setError('Only admins can login through the admin portal.');
         setLoading(false);
         return;
       }
       
+      // Verify token exists in response
+      if (!res.data.token) {
+        console.error('No token received in login response');
+        setError('Authentication error: No token received');
+        setLoading(false);
+        return;
+      }
+      
       // Use the AuthContext login function
+      console.log('Login successful, storing credentials');
       login(res.data.user, res.data.token);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      
+      if (err.response) {
+        console.error('Server response error:', err.response.data);
+        setError(err.response.data.message || 'Login failed. Please try again.');
+      } else if (err.request) {
+        console.error('No response received:', err.request);
+        setError('Network error. Please check your connection.');
+      } else {
+        console.error('Request setup error:', err.message);
+        setError(`Error: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -175,13 +201,22 @@ const Login = () => {
             </button> */}
             
             {loginType === 'user' && (
-              <button
-                type="button"
-                onClick={() => navigate('/register')}
-                className="btn btn-text btn-full"
-              >
-                Don't have an account? Sign Up
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => navigate('/register')}
+                  className="btn btn-text btn-full mb-2"
+                >
+                  Don't have an account? Sign Up
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  className="btn btn-text btn-full"
+                >
+                  Forgot Password?
+                </button>
+              </>
             )}
           </form>
         </div>

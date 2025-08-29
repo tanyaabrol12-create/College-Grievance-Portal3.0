@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import API from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const [userData, setUserData] = useState({
@@ -13,6 +14,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => setUserData({
     ...userData,
@@ -25,9 +27,34 @@ const Register = () => {
     setError('');
     
     try {
-      await API.post('/auth/register', userData);
-      navigate('/');
+      console.log('Sending registration request with data:', userData);
+      const response = await API.post('/auth/register', userData);
+      console.log('Registration successful, full response:', response);
+      console.log('Registration response data:', response.data);
+      
+      // Check if token and user data are returned
+      if (response.data.token && response.data.user) {
+        console.log('Auto-login after registration with token:', response.data.token.substring(0, 20) + '...');
+        console.log('User data for login:', response.data.user);
+        // Use the AuthContext login function to store token and user data
+        const loginSuccess = login(response.data.user, response.data.token);
+        console.log('Login function called, result:', loginSuccess);
+        
+        if (loginSuccess) {
+          console.log('Login successful, redirecting to dashboard');
+          // Redirect to dashboard instead of login page
+          navigate('/dashboard');
+        } else {
+          console.error('Auto-login failed after registration');
+          setError('Registration successful but auto-login failed. Please try logging in manually.');
+          navigate('/');
+        }
+      } else {
+        console.log('No token or user data returned, redirecting to login');
+        navigate('/');
+      }
     } catch (err) {
+      console.error('Registration error:', err);
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);

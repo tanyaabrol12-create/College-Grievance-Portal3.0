@@ -3,6 +3,8 @@ import API from '../services/api';
 import GrievanceCard from '../components/GrievanceCard';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 
 function Dashboard() {
   const [grievances, setGrievances] = useState([]);
@@ -19,10 +21,25 @@ function Dashboard() {
   const fetchGrievances = async () => {
     try {
       setLoading(true);
+      setError('');
+      console.log('Fetching grievances...');
+      const token = localStorage.getItem('token');
+      console.log('Token available:', !!token);
+      
       const res = await API.get('/grievances');
+      console.log('Grievances response:', res.data);
       setGrievances(res.data);
     } catch (err) {
-      setError('Failed to fetch grievances. Please try again.');
+      console.error('Error fetching grievances:', err);
+      if (err.response) {
+        console.error('Response error data:', err.response.data);
+        setError(`Failed to fetch grievances: ${err.response.data.message || err.message}`);
+      } else if (err.request) {
+        console.error('Request error:', err.request);
+        setError('Network error. Please check your connection.');
+      } else {
+        setError(`Error: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }

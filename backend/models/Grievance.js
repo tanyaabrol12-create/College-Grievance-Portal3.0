@@ -6,6 +6,7 @@ const GrievanceSchema = new mongoose.Schema({
   category: String,
   status: { type: String, default: 'Pending' },
   submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  comments: String,
   attachments: [{
     filename: String,
     originalName: String,

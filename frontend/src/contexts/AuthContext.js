@@ -29,10 +29,35 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, tokenData) => {
-    localStorage.setItem('token', tokenData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setToken(tokenData);
-    setUser(userData);
+    console.log('AuthContext login called with:', { 
+      userData: userData, 
+      tokenPreview: tokenData ? tokenData.substring(0, 20) + '...' : 'no token' 
+    });
+    
+    if (!tokenData) {
+      console.error('Login attempted with null/undefined token');
+      return false;
+    }
+    
+    if (!userData) {
+      console.error('Login attempted with null/undefined user data');
+      return false;
+    }
+    
+    try {
+      localStorage.setItem('token', tokenData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      console.log('Auth data saved to localStorage');
+      
+      setToken(tokenData);
+      setUser(userData);
+      console.log('Auth state updated in context');
+      
+      return true;
+    } catch (error) {
+      console.error('Error during login process:', error);
+      return false;
+    }
   };
 
   const logout = () => {
@@ -62,4 +87,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-}; 
+};

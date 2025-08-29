@@ -78,6 +78,14 @@ const Navbar = () => {
               </button>
             )}
 
+            <button
+              className="nav-button"
+              onClick={() => navigate('/about')}
+            >
+              <i className="fas fa-info-circle"></i>
+              About Us
+            </button>
+
             <div className="user-chip">
               {getRoleIcon(user?.role)}
               {user?.role?.toUpperCase() || 'USER'}
@@ -123,12 +131,13 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="navbar-nav">
-            {/* <button
+            <button
               className="nav-button"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/about')}
             >
-              Login
-            </button> */}
+              <i className="fas fa-info-circle"></i>
+              About Us
+            </button>
             <button
               className="nav-button outlined"
               onClick={() => navigate('/register')}

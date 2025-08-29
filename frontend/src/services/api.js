@@ -11,10 +11,14 @@ API.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log(`Request to ${config.url}: Token attached`);
+    } else {
+      console.warn(`Request to ${config.url}: No token available`);
     }
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -22,16 +26,32 @@ API.interceptors.request.use(
 // Response interceptor
 API.interceptors.response.use(
   (response) => {
+    console.log(`Response from ${response.config.url}: Success`);
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Use window.location.href for immediate redirect
-      window.location.href = '/';
+    console.error('API Error:', error);
+    
+    if (error.response) {
+      console.error(`Response error from ${error.config?.url}:`, {
+        status: error.response.status,
+        data: error.response.data
+      });
+      
+      if (error.response.status === 401) {
+        console.warn('Unauthorized access detected - logging out');
+        // Unauthorized - clear token and redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Use window.location.href for immediate redirect
+        window.location.href = '/';
+      }
+    } else if (error.request) {
+      console.error('Request was made but no response received:', error.request);
+    } else {
+      console.error('Error setting up request:', error.message);
     }
+    
     return Promise.reject(error);
   }
 );

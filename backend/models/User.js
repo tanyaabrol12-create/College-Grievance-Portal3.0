@@ -6,7 +6,9 @@ const UserSchema = new mongoose.Schema({
   password: String,
   role: String,
   department: String,
-  isPredefined: { type: Boolean, default: false }
+  isPredefined: { type: Boolean, default: false },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 });
 
 module.exports = mongoose.model('User', UserSchema);

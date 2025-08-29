@@ -5,6 +5,7 @@ const fs = require('fs');
 const Grievance = require('../models/Grievance');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { sendGrievanceSubmissionEmail, sendGrievanceStatusUpdateEmail } = require('../utils/emailService');
 const router = express.Router();
 
 // Configure multer for file uploads
@@ -72,6 +73,17 @@ router.post('/', auth, upload.array('attachments', 10), async (req, res) => {
     await grievance.save();
     console.log('Grievance saved successfully:', grievance);
     
+    // Send email notification to user
+    try {
+      const user = await User.findById(req.user.id);
+      if (user) {
+        await sendGrievanceSubmissionEmail(user.email, user.name, grievance._id, grievance.title);
+      }
+    } catch (emailError) {
+      console.error('Failed to send grievance submission email:', emailError);
+      // Don't fail grievance creation if email fails
+    }
+    
     res.status(201).json(grievance);
   } catch (error) {
     console.error('Grievance creation error:', error);
@@ -91,32 +103,77 @@ router.post('/', auth, upload.array('attachments', 10), async (req, res) => {
 
 router.get('/', auth, async (req, res) => {
   try {
-    const { role, department } = req.user;
+    console.log('Full user object from token:', req.user);
+    
+    // Check if user object is properly populated
+    if (!req.user) {
+      console.error('User object is missing in request');
+      return res.status(401).json({ message: 'Authentication failed - user information missing' });
+    }
+    
+    const { role, department, id } = req.user;
+    
+    if (!id) {
+      console.error('User ID is missing in token payload');
+      return res.status(401).json({ message: 'Authentication failed - user ID missing' });
+    }
+    
     let filter = {};
+
+    console.log('User requesting grievances:', { role, id, department });
 
     // Role-based filtering
     if (role === 'dean') {
       // Dean can see all grievances
+      console.log('Dean role detected - showing all grievances');
       filter = {};
     } else if (role === 'admin') {
       // Admin can see staff, network, and security grievances
+      console.log('Admin role detected - filtering by categories');
       filter.category = { $in: ['staff', 'network', 'security'] };
     } else if (role === 'hod') {
       // HOD can see student and faculty grievances
+      console.log('HOD role detected - filtering by categories');
       filter.category = { $in: ['student', 'faculty'] };
     } else {
       // Regular users (student, faculty) can only see their own grievances
-      filter.submittedBy = req.user.id;
+      console.log('Regular user detected - filtering by submitter ID:', id);
+      
+      const mongoose = require('mongoose');
+      
+      try {
+        // Ensure id is a valid ObjectId
+        if (mongoose.Types.ObjectId.isValid(id)) {
+          filter.submittedBy = mongoose.Types.ObjectId(id);
+          console.log('Using ObjectId for submittedBy filter:', filter.submittedBy);
+        } else {
+          console.error('Invalid ObjectId format for user ID:', id);
+          filter.submittedBy = id; // Fall back to using the string ID
+          console.log('Using string ID for submittedBy filter:', filter.submittedBy);
+        }
+      } catch (idError) {
+        console.error('Error converting ID to ObjectId:', idError);
+        filter.submittedBy = id; // Fall back to using the string ID
+        console.log('Using string ID after error for submittedBy filter:', filter.submittedBy);
+      }
     }
+
+    console.log('Applying filter:', JSON.stringify(filter));
 
     const grievances = await Grievance.find(filter)
       .populate('submittedBy', 'name email role department')
       .sort({ createdAt: -1 });
 
+    console.log(`Found ${grievances.length} grievances`);
     res.json(grievances);
   } catch (error) {
     console.error('Grievance fetch error:', error);
-    res.status(500).json({ message: 'Failed to fetch grievances' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      message: 'Failed to fetch grievances', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined 
+    });
   }
 });
 
@@ -171,7 +228,7 @@ router.get('/attachments/:grievanceId/:filename', auth, async (req, res) => {
 router.put('/:id/status', auth, async (req, res) => {
   try {
     const { role } = req.user;
-    const { status } = req.body;
+    const { status, comments } = req.body;
 
     // Only admin, dean, and hod can update status
     if (!['admin', 'dean', 'hod'].includes(role)) {
@@ -180,12 +237,29 @@ router.put('/:id/status', auth, async (req, res) => {
 
     const grievance = await Grievance.findByIdAndUpdate(
       req.params.id, 
-      { status }, 
+      { status, comments }, 
       { new: true }
     ).populate('submittedBy', 'name email role department');
 
     if (!grievance) {
       return res.status(404).json({ message: 'Grievance not found' });
+    }
+
+    // Send email notification to user about status update
+    try {
+      if (grievance.submittedBy && grievance.submittedBy.email) {
+        await sendGrievanceStatusUpdateEmail(
+          grievance.submittedBy.email,
+          grievance.submittedBy.name,
+          grievance._id,
+          grievance.title,
+          status,
+          comments
+        );
+      }
+    } catch (emailError) {
+      console.error('Failed to send status update email:', emailError);
+      // Don't fail status update if email fails
     }
 
     res.json(grievance);
