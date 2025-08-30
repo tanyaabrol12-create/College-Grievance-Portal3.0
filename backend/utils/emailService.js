@@ -194,7 +194,7 @@ const sendWelcomeEmail = async (email, name) => {
             </p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="http://localhost:3000" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+              <a href="https://college-grievance-portal3-0-frontend1.onrender.com" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
                 Access Your Dashboard
               </a>
             </div>
@@ -271,7 +271,7 @@ const sendGrievanceSubmissionEmail = async (email, name, grievanceId, subject) =
             </p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="http://localhost:3000/dashboard" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+              <a href="https://college-grievance-portal3-0-frontend1.onrender.com/dashboard" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
                 View Your Dashboard
               </a>
             </div>
@@ -382,7 +382,7 @@ const sendGrievanceStatusUpdateEmail = async (email, name, grievanceId, subject,
             </p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="http://localhost:3000/dashboard" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+              <a href="https://college-grievance-portal3-0-frontend1.onrender.com/dashboard" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
                 View Your Dashboard
               </a>
             </div>

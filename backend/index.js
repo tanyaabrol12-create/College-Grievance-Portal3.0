@@ -9,6 +9,8 @@ const app = express();
 
 // Configure CORS to allow localhost (any port) and optional deployed frontend
 const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -30,7 +32,7 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB connection with better error handling
-const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/college-grievance-portal';
+const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
