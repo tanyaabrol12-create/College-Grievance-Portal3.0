@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const app = express(); // <-- Add this line
+
 const allowedOrigin = process.env.FRONTEND_URL;
 
 app.use(cors({
