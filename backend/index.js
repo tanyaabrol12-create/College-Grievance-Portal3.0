@@ -11,7 +11,9 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
+  "https://college-grievance-portal3-0-frontend1.onrender.com/api",
+  "https://college-grievance-portal3-0-frontend1.onrender.com/"
 ].filter(Boolean);
 
 
