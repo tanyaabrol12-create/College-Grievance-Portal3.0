@@ -1,34 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const User = require('./models/User');
 require('dotenv').config();
 
-const app = express();
-
-// Configure CORS to allow localhost (any port) and optional deployed frontend
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  process.env.FRONTEND_URL,
-  "https://college-grievance-portal3-0-frontend1.onrender.com/api",
-  "https://college-grievance-portal3-0-frontend1.onrender.com/"
-].filter(Boolean);
-
+const allowedOrigin = process.env.FRONTEND_URL;
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\\d+)?$/.test(origin);
-    if (isLocalhost || allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true
+  origin: allowedOrigin,
+  credentials: true, // if you use cookies or authentication
 }));
 
 // Preflight is handled by cors middleware above; no explicit catch-all needed
