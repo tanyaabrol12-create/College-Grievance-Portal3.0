@@ -3,23 +3,21 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-const app = express(); // <-- Add this line
+const app = express();
 
-const allowedOrigin = process.env.FRONTEND_URL;
+const allowedOrigin = [process.env.FRONTEND_URL,"http://localhost:3000/"];
 
 app.use(cors({
   origin: allowedOrigin,
-  credentials: true, // if you use cookies or authentication
+  credentials: true, 
+  // if you use cookies or authentication
 }));
 
-// Preflight is handled by cors middleware above; no explicit catch-all needed
 app.use(express.json());
 
 // MongoDB connection with better error handling
 const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri, {
-  // useNewUrlParser: true,
-  // useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000 // 5 seconds timeout for server selection
 })
   .then(() => {
@@ -38,8 +36,6 @@ const initializeAdminUsers = async () => {
     const deanExists = await User.findOne({ email: process.env.ADMIN_ID });
     const hodExists = await User.findOne({ email: process.env.HOD_ID });
     
-    // Only Dean and HOD should be predefined admins. No generic admin user.
-
     if (!deanExists && process.env.ADMIN_ID && process.env.ADMIN_PASS) {
       const deanPassword = await bcrypt.hash(process.env.ADMIN_PASS, 10);
       const deanUser = new User({
@@ -78,13 +74,11 @@ const initializeAdminUsers = async () => {
   }
 };
 
-// Initialize admin users when server starts
 mongoose.connection.once('open', () => {
   console.log('Connected to MongoDB');
   initializeAdminUsers();
 });
 
-// Add error handling for MongoDB connection
 mongoose.connection.on('error', (error) => {
   console.error('MongoDB connection error:', error);
 });
@@ -93,7 +87,6 @@ mongoose.connection.on('disconnected', () => {
   console.log('MongoDB disconnected');
 });
 
-// Add request logging middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
   next();
@@ -102,7 +95,6 @@ app.use((req, res, next) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/grievances', require('./routes/grievance'));
 
-// Add a test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend is running successfully!' });
 })
@@ -114,5 +106,4 @@ if (process.env.PORT === '3000' && !process.env.BACKEND_PORT) {
 }
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  // console.log(`Test the API at: http://localhost:${PORT}/api/test`);
 });
