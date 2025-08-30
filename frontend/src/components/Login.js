@@ -260,7 +260,7 @@ const Login = () => {
                   Get Started
                 </h2>
                 
-                <p className="text-secondary mb-6">
+                <p className="text-secondary mb-12">
                   Choose your login type to access the Portal
                 </p>
 
