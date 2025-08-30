@@ -14,6 +14,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -34,8 +35,8 @@ app.use(express.json());
 // MongoDB connection with better error handling
 const mongoUri = process.env.MONGO_URI;
 mongoose.connect(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  // useNewUrlParser: true,
+  // useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000 // 5 seconds timeout for server selection
 })
   .then(() => {
