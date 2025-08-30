@@ -85,7 +85,7 @@ const sendPasswordResetEmail = async (email, otp) => {
     const transporter = await getTransporter();
     
     const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || '"College Grievance Portal" <noreply@cgp.com>',
+      from: `"College Grievance Portal"<${process.env.EMAIL_FROM || process.env.EMAIL_USER }>`|| '"College Grievance Portal" <noreply@cgp.com>',
       to: email,
       subject: 'Password Reset Request - College Grievance Portal',
       html: `
@@ -162,7 +162,7 @@ const sendWelcomeEmail = async (email, name) => {
     const transporter = await getTransporter();
     
     const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || '"College Grievance Portal" <noreply@cgp.com>',
+      from: `"College Grievance Portal"<${process.env.EMAIL_FROM || process.env.EMAIL_USER }>` || '"College Grievance Portal" <noreply@cgp.com>',
       to: email,
       subject: 'Welcome to College Grievance Portal',
       html: `
@@ -240,7 +240,7 @@ const sendGrievanceSubmissionEmail = async (email, name, grievanceId, subject) =
     const transporter = await getTransporter();
     
     const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || '"College Grievance Portal" <noreply@cgp.com>',
+      from:  `"College Grievance Portal"<${process.env.EMAIL_FROM || process.env.EMAIL_USER }>`|| '"College Grievance Portal" <noreply@cgp.com>',
       to: email,
       subject: 'Grievance Submitted Successfully - College Grievance Portal',
       html: `
@@ -345,7 +345,7 @@ const sendGrievanceStatusUpdateEmail = async (email, name, grievanceId, subject,
     };
     
     const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || '"College Grievance Portal" <noreply@cgp.com>',
+      from:  `"College Grievance Portal"<${process.env.EMAIL_FROM || process.env.EMAIL_USER }>`|| '"College Grievance Portal" <noreply@cgp.com>',
       to: email,
       subject: `Grievance Status Update: ${status.toUpperCase()} - College Grievance Portal`,
       html: `
