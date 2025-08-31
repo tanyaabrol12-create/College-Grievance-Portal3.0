@@ -89,14 +89,14 @@ The frontend will run on `http://localhost:3000`
 ### Predefined Admin Users
 
 #### System Administrator (Dean)
-- **Email**: admin@cgs.com
-- **Password**: admin123
+- **Email**:*****@cgs.com
+- **Password**: *******
 - **Access**: Can view ALL grievances from any user
 - **Permissions**: Full access to all grievance categories
 
 #### Head of Department (HOD)
-- **Email**: hod@cgs.com
-- **Password**: hod123
+- **Email**:****@cgs.com
+- **Password**: ******
 - **Access**: Can view student and faculty grievances only
 - **Permissions**: Limited to student and faculty categories
 
@@ -166,8 +166,6 @@ The frontend will run on `http://localhost:3000`
 
 ### For Admin Users
 1. **Login with predefined credentials**:
-   - Dean: admin@cgs.com / admin123
-   - HOD: hod@cgs.com / hod123
 2. **Access all grievances** based on your role
 3. **Update grievance status** as needed
 
@@ -233,13 +231,13 @@ npm start
 ## Admin Credentials
 
 ### System Administrator (Dean)
-- **Email**: admin@cgs.com
-- **Password**: admin123
+- **Email**:****@cgs.com
+- **Password**: *****
 - **Access Level**: Full access to all grievances
 
 ### Head of Department (HOD)
-- **Email**: hod@cgs.com
-- **Password**: hod123
+- **Email**:*****@cgs.com
+- **Password**:******
 - **Access Level**: Student and faculty grievances only
 
 ## Development
